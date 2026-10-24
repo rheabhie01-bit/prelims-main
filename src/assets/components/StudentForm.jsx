@@ -1,7 +1,6 @@
 import { Component } from 'react';
 
 export default class StudentForm extends Component {
-  // when editing, the fields start with the student's current info
   state = {
     name: this.props.editingStudent ? this.props.editingStudent.name : '',
     course: this.props.editingStudent ? this.props.editingStudent.course : '',

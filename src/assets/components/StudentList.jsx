@@ -1,5 +1,7 @@
 import { Component } from 'react';
 
+const TONE_COUNT = 6;
+
 export default class StudentList extends Component {
   handleDelete = (id) => {
     if (window.confirm('Delete this student?')) {
@@ -11,16 +13,42 @@ export default class StudentList extends Component {
     return name ? name.trim().charAt(0).toUpperCase() : '?';
   }
 
+  getTone(text) {
+    const value = String(text || '').toLowerCase();
+    let total = 0;
+
+    for (let i = 0; i < value.length; i++) {
+      total += value.charCodeAt(i);
+    }
+
+    return `tone-${total % TONE_COUNT}`;
+  }
+
+  renderEmptyState() {
+    const { searchText } = this.props;
+
+    if (searchText) {
+      return (
+        <div className="empty-state">
+          <p>No matches found.</p>
+          <span>Nothing matches "{searchText}". Try a different search.</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="empty-state">
+        <p>No students yet.</p>
+        <span>Students you add will show up here.</span>
+      </div>
+    );
+  }
+
   render() {
     const { students, editingId, startEdit } = this.props;
 
     if (students.length === 0) {
-      return (
-        <div className="empty-state">
-          <p>No students yet.</p>
-          <span>Students you add will show up here.</span>
-        </div>
-      );
+      return this.renderEmptyState();
     }
 
     return (
@@ -37,20 +65,25 @@ export default class StudentList extends Component {
           </thead>
 
           <tbody>
-            {students.map((student) => (
+            {students.map((student, index) => (
               <tr
                 key={student.id}
                 className={student.id === editingId ? 'editing-row' : ''}
+                style={{ animationDelay: `${index * 40}ms` }}
               >
                 <td className="id-cell">#{student.id}</td>
                 <td>
                   <div className="student-cell">
-                    <span className="avatar">{this.getInitial(student.name)}</span>
+                    <span className={`avatar ${this.getTone(student.name)}`}>
+                      {this.getInitial(student.name)}
+                    </span>
                     {student.name}
                   </div>
                 </td>
                 <td>
-                  <span className="course-badge">{student.course}</span>
+                  <span className={`course-badge ${this.getTone(student.course)}`}>
+                    {student.course}
+                  </span>
                 </td>
                 <td>{student.age}</td>
                 <td className="action-cell">
